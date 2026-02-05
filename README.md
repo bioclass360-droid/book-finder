@@ -3,7 +3,7 @@
 "What should I read next?" is a question millions of people ask every day. **Next Read AI** solves this decision paralysis. It is a minimalist recommendation engine that matches readers with their perfect book based on **Genre** and **Current Mood**.
 
 ## 🚀 Live Demo
-**[Insert your live link here, e.g., https://yourusername.github.io/book-finder/]**
+**(https://bioclass360-droid.github.io/book-finder/)**
 
 ## ✨ Key Features
 - **Mood-Based Filtering:** Unlike Amazon (which filters by category), this tool filters by *vibe* (e.g., "Easy & Quick" vs. "Deep & Serious").
