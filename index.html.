@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Next Read AI - Find Your Perfect Book</title>
+    <meta name="description" content="Don't know what to read next? Answer 2 questions and get the perfect book recommendation.">
+
+    <style>
+        :root {
+            --primary: #8b5cf6; /* Purple for Books */
+            --bg: #f3f4f6;
+            --card: #ffffff;
+            --text: #1f2937;
+        }
+
+        body {
+            font-family: 'Georgia', serif; 
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        h1 { font-family: sans-serif; font-size: 2.5rem; margin-bottom: 10px; color: var(--primary); }
+        p.subtitle { color: #6b7280; font-family: sans-serif; font-size: 1.1rem; margin-bottom: 40px; }
+
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.5s ease; }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button.option-btn {
+            background: var(--card);
+            border: 2px solid #e5e7eb;
+            padding: 25px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: var(--text);
+            font-family: sans-serif;
+        }
+
+        button.option-btn:hover {
+            border-color: var(--primary);
+            background: #f5f3ff;
+            transform: translateY(-2px);
+        }
+
+        /* Result Card */
+        .result-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: left;
+            border-top: 5px solid var(--primary);
+        }
+
+        .book-title { font-size: 2rem; font-weight: bold; margin-bottom: 5px; line-height: 1.2; }
+        .book-author { color: #6b7280; font-size: 1.2rem; margin-bottom: 20px; font-style: italic; }
+        
+        .book-desc { 
+            font-size: 1.1rem; line-height: 1.6; color: #374151; margin-bottom: 25px; 
+            background: #f9fafb; padding: 15px; border-radius: 8px; border-left: 4px solid #d1d5db;
+        }
+
+        .tag-container { display: flex; gap: 10px; margin-bottom: 30px; }
+        .tag { background: #e0e7ff; color: #4338ca; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-family: sans-serif; font-weight: bold;}
+
+        .buy-btn {
+            display: block;
+            width: 100%;
+            background: #ea580c; /* Amazon Orange */
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-family: sans-serif;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 6px rgba(234, 88, 12, 0.3);
+            transition: transform 0.2s;
+        }
+        .buy-btn:hover { transform: scale(1.02); }
+
+        .reset-link { margin-top: 20px; display: block; color: #9ca3af; cursor: pointer; text-decoration: underline; text-align: center; font-family: sans-serif; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="step-0" class="step active">
+            <h1>📚 Next Read AI</h1>
+            <p class="subtitle">Stop scrolling. Tell us your mood, and we'll pick your next favorite book.</p>
+            <button class="option-btn" onclick="nextStep(1)" style="width:100%; background:var(--primary); color:white; border:none;">Find My Book</button>
+        </div>
+
+        <div id="step-1" class="step">
+            <h2 style="font-family: sans-serif;">What genre do you like?</h2>
+            <div class="option-grid">
+                <button class="option-btn" onclick="selectCat('wealth')">💰 Wealth & Success</button>
+                <button class="option-btn" onclick="selectCat('mind')">🧠 Psychology</button>
+                <button class="option-btn" onclick="selectCat('thriller')">🔪 Mystery / Thriller</button>
+                <button class="option-btn" onclick="selectCat('romance')">❤️ Romance / Drama</button>
+            </div>
+        </div>
+
+        <div id="step-2" class="step">
+            <h2 style="font-family: sans-serif;">What's the vibe?</h2>
+            <div class="option-grid">
+                <button class="option-btn" onclick="selectMood('easy')">☕ Easy & Quick</button>
+                <button class="option-btn" onclick="selectMood('deep')">🧐 Deep & Gripping</button>
+            </div>
+        </div>
+
+        <div id="step-result" class="step">
+            <p class="subtitle">✨ We found the perfect match:</p>
+            
+            <div class="result-card">
+                <div class="book-title" id="res-title">Loading...</div>
+                <div class="book-author" id="res-author">by Author Name</div>
+                
+                <div class="tag-container">
+                    <div class="tag" id="tag-1">#Bestseller</div>
+                    <div class="tag" id="tag-2">#MustRead</div>
+                </div>
+
+                <div class="book-desc" id="res-desc">
+                    Book description goes here...
+                </div>
+
+                <a href="#" target="_blank" class="buy-btn" id="res-link">Get it on Amazon ↗</a>
+                <div class="reset-link" onclick="location.reload()">Start Over</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let userChoices = { cat: '', mood: '' };
+
+        // --- DATABASE: Updated with High-Selling Categories ---
+        const books = [
+            // WEALTH & SUCCESS
+            { cat: 'wealth', mood: 'easy', title: 'The Psychology of Money', author: 'Morgan Housel', 
+              desc: '19 short stories about how people think about money. No complex math, just pure wisdom on wealth.',
+              tags: ['#Finance', '#Bestseller'], link: 'https://www.amazon.in/s?k=Psychology+of+Money' },
+            
+            { cat: 'wealth', mood: 'deep', title: 'Zero to One', author: 'Peter Thiel', 
+              desc: 'The ultimate guide to building a startup and creating the future. Dense, contrarian, and brilliant.',
+              tags: ['#Startups', '#Business'], link: 'https://www.amazon.in/s?k=Zero+to+One' },
+
+            // PSYCHOLOGY
+            { cat: 'mind', mood: 'easy', title: 'Atomic Habits', author: 'James Clear', 
+              desc: 'The most practical book ever written on changing your life. Small changes, massive results.',
+              tags: ['#SelfHelp', '#LifeHacks'], link: 'https://www.amazon.in/s?k=Atomic+Habits' },
+
+            { cat: 'mind', mood: 'deep', title: 'The Laws of Human Nature', author: 'Robert Greene', 
+              desc: 'A massive, detailed guide to understanding why people do what they do. Master manipulation and social dynamics.',
+              tags: ['#Power', '#Psychology'], link: 'https://www.amazon.in/s?k=The+Laws+of+Human+Nature' },
+
+            // MYSTERY / THRILLER (Replaces Biology)
+            { cat: 'thriller', mood: 'easy', title: 'The Silent Patient', author: 'Alex Michaelides', 
+              desc: 'A woman shoots her husband 5 times in the face, then never speaks another word. Why? The ending will shock you.',
+              tags: ['#Thriller', '#PageTurner'], link: 'https://www.amazon.in/s?k=The+Silent+Patient' },
+
+            { cat: 'thriller', mood: 'deep', title: 'Gone Girl', author: 'Gillian Flynn', 
+              desc: 'A dark, twisted masterpiece about a marriage gone wrong. Complex characters and a mind-bending plot.',
+              tags: ['#Dark', '#Mystery'], link: 'https://www.amazon.in/s?k=Gone+Girl' },
+
+            // ROMANCE / DRAMA (Replaces Fiction)
+            { cat: 'romance', mood: 'easy', title: 'It Ends with Us', author: 'Colleen Hoover', 
+              desc: 'The book that broke the internet. An emotional rollercoaster about love, heartbreak, and resilience.',
+              tags: ['#Romance', '#TikTokFamous'], link: 'https://www.amazon.in/s?k=It+Ends+with+Us' },
+
+            { cat: 'romance', mood: 'deep', title: 'The Kite Runner', author: 'Khaled Hosseini', 
+              desc: 'A heartbreaking story of friendship and betrayal in Afghanistan. It will make you cry. Beautifully written.',
+              tags: ['#Classic', '#Emotional'], link: 'https://www.amazon.in/s?k=The+Kite+Runner' }
+        ];
+
+        // --- LOGIC ---
+        function nextStep(n) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById('step-' + n).classList.add('active');
+        }
+
+        function selectCat(c) { userChoices.cat = c; nextStep(2); }
+        function selectMood(m) { userChoices.mood = m; findResult(); }
+
+        function findResult() {
+            let match = books.find(b => b.cat === userChoices.cat && b.mood === userChoices.mood);
+            if (!match) match = books[0]; 
+
+            document.getElementById('res-title').innerText = match.title;
+            document.getElementById('res-author').innerText = 'by ' + match.author;
+            document.getElementById('res-desc').innerText = match.desc;
+            document.getElementById('res-link').href = match.link;
+            document.getElementById('tag-1').innerText = match.tags[0];
+            document.getElementById('tag-2').innerText = match.tags[1];
+
+            nextStep('result');
+        }
+    </script>
+</body>
+</html>
